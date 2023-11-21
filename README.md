@@ -13,3 +13,8 @@ The script will create a date and timestamped tarball containing the items below
 * All sync logs
 * docker info output
 * docker inspect output
+
+### Nice to haves:
+* Option to pull a certain number of days logs
+* Option to encrypt with a key
+* Option to redact sensitive customer information
