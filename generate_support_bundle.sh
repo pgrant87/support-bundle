@@ -1,15 +1,41 @@
 #!/bin/bash
+# This script generates a support bundle for Airbyte
 
+### Global variables ###
 CONTAINERS=$(docker-compose ps --format "{{.Names}}")
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
-mkdir -p "$BUNDLE_DIR"
+CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
 
+###Function definitions ###
+# Function to create the bundle directory structure:
+build_bundle_dir () {
+  mkdir -p "$CONTAINER_LOGS_DIR"
+}
+
+# Function to collect the docker details:
+get_docker_info () {
+  docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
+}
+
+# Function to collect all the container logs:
+get_container_logs () {
 for CONTAINER in $CONTAINERS; do
-  docker logs "$CONTAINER" > "$BUNDLE_DIR/$CONTAINER.log"
+  docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log"
 done
+}
 
-tar -czf "$BUNDLE_DIR.tar.gz" "$BUNDLE_DIR"
+# Function to compress the bundle directory, print the size and location of the archive 
+# and then remove the bundle directory:
+clean_up () {
+  tar -czf "$BUNDLE_DIR.tar.gz" -C $BUNDLE_DIR .
+  echo "$(du -sh "$BUNDLE_DIR.tar.gz" | cut -f1) support bundle generated at "$BUNDLE_DIR.tar.gz""
+  rm -rf "$BUNDLE_DIR"
+}
 
-echo "Support bundle generated at $BUNDLE_DIR"
+### Main flow and function calls ###
+build_bundle_dir  
+get_docker_info
+get_container_logs
+clean_up
 
 exit 0
