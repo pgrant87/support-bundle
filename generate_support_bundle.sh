@@ -19,9 +19,9 @@ get_docker_info () {
 
 # Function to collect all the container logs:
 get_container_logs () {
-for CONTAINER in $CONTAINERS; do
-  docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log"
-done
+  for CONTAINER in $CONTAINERS; do
+    docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log"
+  done
 }
 
 # Function to compress the bundle directory, print the size and location of the archive 
