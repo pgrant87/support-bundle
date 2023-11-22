@@ -10,7 +10,7 @@ _generate_support_bundle.sh_ is the main bash script and entry point, it will ne
 
 Working doc for this at https://docs.google.com/document/d/1xue_F3tKxAZnFYQhMkNlCN9uVqJhJSslfwUM6XzzMEA/edit?usp=sharing
 
-###Items to gather / To-do list
+### Items to gather / To-do list
 * All container logs ✅
 * docker-compose.yaml ✅
 * .env (will need password and sensitive data redaction)
