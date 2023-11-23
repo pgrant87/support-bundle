@@ -1,12 +1,12 @@
 #!/bin/bash
 # This script generates a support bundle for Airbyte
 
-### Global variables ###
+### GLOBAL VARIABLES ###
 CONTAINERS=$(docker-compose ps --format "{{.Names}}")
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
 
-###Function definitions ###
+### FUNCTION DECLARATIONS ###
 # Function to create the bundle directory structure:
 build_bundle_dir () {
   mkdir -p "$CONTAINER_LOGS_DIR"
@@ -14,13 +14,13 @@ build_bundle_dir () {
 
 # Function to collect the docker details:
 get_docker_info () {
-  docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
+  docker-compose config --quiet > "$BUNDLE_DIR/docker-compose.yaml"
 }
 
 # Function to collect all the container logs:
 get_container_logs () {
   for CONTAINER in $CONTAINERS; do
-    docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log"
+    docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log" 2>&1
   done
 }
 
@@ -32,10 +32,14 @@ clean_up () {
   rm -rf "$BUNDLE_DIR"
 }
 
-### Main flow and function calls ###
-build_bundle_dir  
-get_docker_info
-get_container_logs
-clean_up
+# Main flow and function calls:
+main () {
+  build_bundle_dir
+  get_docker_info
+  get_container_logs
+  clean_up
+}
 
+### BUNDLE EXECUTION ###
+main
 exit 0

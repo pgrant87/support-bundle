@@ -6,9 +6,9 @@ A script that will gather all logging, configuration and anything that could be 
 
 The script will create a date and timestamped tarball containing all the items below and print the location and size for the user to easily transfer to Airbyte support.
 
-_generate_support_bundle.sh_ is the main bash script and entry point, it will need to be run from inside the user’s Airbyte directory. To start, we’ll concentrate on Docker installations before adding functionality for Kubernetes.
+_generate_support_bundle.sh_ is the main bash script and entry point. To start, we’ll concentrate on Docker installations before adding functionality for Kubernetes.
 
-Working doc for this at https://docs.google.com/document/d/1xue_F3tKxAZnFYQhMkNlCN9uVqJhJSslfwUM6XzzMEA/edit?usp=sharing
+Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFYQhMkNlCN9uVqJhJSslfwUM6XzzMEA/edit?usp=sharing
 
 ### Items to gather / To-do list
 * All container logs ✅
@@ -26,3 +26,7 @@ Working doc for this at https://docs.google.com/document/d/1xue_F3tKxAZnFYQhMkNl
 * Database Schemas
 * Network config and connection details
 * Metrics details
+
+### Usage
+
+Clone this repo inside your airbyte directory and run `generate_support_bundle.sh` to test the support bundle.
