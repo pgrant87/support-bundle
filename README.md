@@ -13,9 +13,9 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 ### Items to gather / To-do list
 * All container logs ✅
 * docker-compose.yaml ✅
-* .env (will need password and sensitive data redaction)
+* .env ✅(docker-compose.yaml currently populated with the values from .env, will need password redaction)
 * Sync logs (A few days worth to start?)
-* Host info/specs
+* Host info/specs ✅
 * System performance/timeline
 * docker info
 * docker inspect output
