@@ -13,7 +13,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 ### Items to gather / To-do list
 * All container logs ✅
 * docker-compose.yaml ✅
-* .env ✅(docker-compose.yaml currently populated with the values from .env, will need password redaction)
+* .env ✅ (docker-compose.yaml currently populated with the values from .env, will need password redaction)
 * Sync logs (A few days worth to start?)
 * Host info/specs ✅
 * System performance/timeline
@@ -30,3 +30,11 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 ### Usage
 
 Clone this repo inside your airbyte directory and run `generate_support_bundle.sh` to test the support bundle.
+
+### Development
+
+For any additions, I would ask that the [Shellcheck](https://www.shellcheck.net/) linter is adhered to:
+https://github.com/koalaman/shellcheck
+
+The VScode plugin is particularly useful:
+https://github.com/vscode-shellcheck/vscode-shellcheck
