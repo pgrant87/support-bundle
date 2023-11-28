@@ -22,7 +22,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * Connector configuration and info ✅
 * Current connector versions
 * Connector upgrade history
-* Connections in use
+* Connections in use ✅
 * Database table info/sizes
 * Database Schemas
 * Network config and connection details
