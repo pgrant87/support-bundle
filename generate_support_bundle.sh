@@ -1,20 +1,19 @@
 #!/bin/bash
 # This script generates a support bundle for Airbyte
 
-### GLOBAL VARIABLES ###
+
+########## GLOBAL VARIABLES ##########
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
 CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
+CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
 SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
+API_AUTH=""
 
-### FUNCTION DECLARATIONS ###
 
-# Function to create the bundle directory structure:
-build_bundle_dir () {
-  mkdir -p "$CONTAINER_LOGS_DIR"
-}
+########## FUNCTION DECLARATIONS ##########
 
-# Banner function for street cred:
+# Pointless banner function for street cred:
 print_banner () {
   # Make sure the console is huuuge
   if test "$(tput cols)" -ge 64; then
@@ -31,6 +30,12 @@ print_banner () {
     echo -e "\033[0m"
     sleep 1
   fi
+}
+
+# Function to create the bundle directory structure:
+build_bundle_dir () {
+  mkdir -p "$CONTAINER_LOGS_DIR"
+  mkdir -p "$CONNECTOR_INFO_DIR"
 }
 
 # Function to collect system info:
@@ -96,6 +101,30 @@ get_container_logs () {
   done
 }
 
+# function to gather base64 API authentication credintials from .env file:
+get_env_credentials () {
+  ENV_FILE="../.env"
+  if [ -f "$ENV_FILE" ]; then
+    USER=$(grep -E "BASIC_AUTH_USERNAME" "$ENV_FILE" | cut -d '=' -f2)
+    PW=$(grep -E "BASIC_AUTH_PASSWORD" "$ENV_FILE" | cut -d '=' -f2)
+    API_AUTH=$(echo -n "$USER:$PW" | base64)
+  fi
+}
+
+# Function to collect source, destination and connection details via the airbyte API:
+get_connector_details () {
+  get_env_credentials
+
+  # API endpoints
+  API_SOURCE='http://localhost:8006/v1/sources/'
+  API_DEST='http://localhost:8006/v1/destinations/'
+  API_CONNECTIONS='http://localhost:8006/v1/connections/'
+
+  curl -s --location --request GET "$API_SOURCE" --header "Authorization: Basic ""$API_AUTH"" " > "$CONNECTOR_INFO_DIR/sources.json"
+  curl -s --location --request GET "$API_DEST" --header "Authorization: Basic ""$API_AUTH"" " > "$CONNECTOR_INFO_DIR/destinations.json"
+  curl -s --location --request GET "$API_CONNECTIONS" --header "Authorization: Basic ""$API_AUTH"" " > "$CONNECTOR_INFO_DIR/connections.json"
+}
+
 # Function to compress the bundle directory, print the size and location of the archive 
 # and then remove the bundle directory:
 clean_up () {
@@ -111,9 +140,11 @@ main () {
   get_system_info
   get_docker_info
   get_container_logs
+  get_connector_details
   clean_up
 }
 
-### BUNDLE EXECUTION ###
+
+########## BUNDLE EXECUTION ##########
 main
 exit 0

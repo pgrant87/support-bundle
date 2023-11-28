@@ -19,6 +19,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * System performance/timeline
 * docker info
 * docker inspect output
+* Connector configuration and info ✅
 * Current connector versions
 * Connector upgrade history
 * Connections in use
