@@ -7,6 +7,8 @@ BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
 CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
 CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
+DOCKER_INFO_DIR="$BUNDLE_DIR/docker_info"
+DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
 SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
 API_AUTH=""
 
@@ -36,6 +38,7 @@ print_banner () {
 build_bundle_dir () {
   mkdir -p "$CONTAINER_LOGS_DIR"
   mkdir -p "$CONNECTOR_INFO_DIR"
+  mkdir -p "$DOCKER_INSPECT_DIR"
 }
 
 # Function to collect system info:
@@ -46,6 +49,11 @@ get_system_info () {
     {
       printf "System Information:" 
       printf "\n------------------------\n" 
+      printf "\nHostname:\n"
+      hostname
+      printf "\nIP Address:\n"
+      hostname -I
+      printf "\nOS Information:\n"
       uname -a 
       printf "\n"
       lsb_release -a
@@ -65,7 +73,12 @@ get_system_info () {
   get_mac_info () {
     {
       printf "System Information" 
-      printf "\n----------------------\n" 
+      printf "\n----------------------\n"
+      printf "\nHostname:\n"
+      hostname
+      printf "\nIP Address:\n"
+      ipconfig getifaddr en0
+      printf "\nOS Information:\n"
       uname -a
       printf "\n"
       system_profiler SPHardwareDataType SPSoftwareDataType 
@@ -90,14 +103,25 @@ get_system_info () {
 
 # Function to collect docker details:
 get_docker_info () {
-  docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
+  docker version > "$DOCKER_INFO_DIR/docker-version.txt" 
+  docker ps -a > "$DOCKER_INFO_DIR/docker-ps.txt"
+  docker network inspect airbyte_default > "$DOCKER_INFO_DIR/docker-network.txt"
+  docker images > "$DOCKER_INFO_DIR/docker-images.txt"
+  docker system df > "$DOCKER_INFO_DIR/docker-system.txt"
+  docker info > "$DOCKER_INFO_DIR/docker-info.txt"
+  docker-compose config > "$DOCKER_INFO_DIR/docker-compose.yaml"
+  docker-compose ps > "$DOCKER_INFO_DIR/docker-compose-ps.txt"
+  docker-compose top > "$DOCKER_INFO_DIR/docker-compose-top.txt"
+  docker-compose version > "$DOCKER_INFO_DIR/docker-compose-version.txt"
+  docker-compose images > "$DOCKER_INFO_DIR/docker-compose-images.txt"
 }
 
-# Function to collect all the container logs:
-get_container_logs () {
+# Function to collect all the container logs inspect details:
+get_container_info () {
   CONTAINERS=$(docker-compose ps --format "{{.Names}}")
   for CONTAINER in $CONTAINERS; do
     docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log" 2>&1
+    docker inspect "$CONTAINER" > "$DOCKER_INSPECT_DIR/$CONTAINER-inspect.txt" 2>&1
   done
 }
 
@@ -139,7 +163,7 @@ main () {
   build_bundle_dir
   get_system_info
   get_docker_info
-  get_container_logs
+  get_container_info
   get_connector_details
   clean_up
 }
