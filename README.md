@@ -24,7 +24,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * Connector upgrade history
 * Connections in use ✅
 * Database table info/sizes
-* Database Schemas
+* Database Schema ✅
 * Network config and connection details
 * Metrics details
 

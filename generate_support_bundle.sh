@@ -9,6 +9,7 @@ CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
 CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
 DOCKER_INFO_DIR="$BUNDLE_DIR/docker_info"
 DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
+DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
 SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
 API_AUTH=""
 
@@ -39,6 +40,7 @@ build_bundle_dir () {
   mkdir -p "$CONTAINER_LOGS_DIR"
   mkdir -p "$CONNECTOR_INFO_DIR"
   mkdir -p "$DOCKER_INSPECT_DIR"
+  mkdir -p "$DATABASE_INFO_DIR"
 }
 
 # Function to collect system info:
@@ -116,7 +118,7 @@ get_docker_info () {
   docker-compose images > "$DOCKER_INFO_DIR/docker-compose-images.txt"
 }
 
-# Function to collect all the container logs inspect details:
+# Function to collect all the container logs and inspect output:
 get_container_info () {
   CONTAINERS=$(docker-compose ps --format "{{.Names}}")
   for CONTAINER in $CONTAINERS; do
@@ -149,6 +151,12 @@ get_connector_details () {
   curl -s --location --request GET "$API_CONNECTIONS" --header "Authorization: Basic ""$API_AUTH"" " > "$CONNECTOR_INFO_DIR/connections.json"
 }
 
+# Function to collect database tables, sizes and schema
+get_database_info () {
+  #command to collec tthe db schema:
+  docker exec -i airbyte-db pg_dump -U docker -d airbyte --schema-only > "$DATABASE_INFO_DIR/schema.sql"
+}
+
 # Function to compress the bundle directory, print the size and location of the archive 
 # and then remove the bundle directory:
 clean_up () {
@@ -165,6 +173,7 @@ main () {
   get_docker_info
   get_container_info
   get_connector_details
+  get_database_info
   clean_up
 }
 
