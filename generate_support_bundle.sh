@@ -155,6 +155,22 @@ get_connector_details () {
 get_database_info () {
   #command to collec tthe db schema:
   docker exec -i airbyte-db pg_dump -U docker -d airbyte --schema-only > "$DATABASE_INFO_DIR/schema.sql"
+  #command to collect the db tables and sizes:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "\dt+;" > "$DATABASE_INFO_DIR/tables.txt"
+  #command to collect the db table sizes:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT table_name, pg_size_pretty(total_bytes) AS total, \
+  pg_size_pretty(index_bytes) AS INDEX, pg_size_pretty(toast_bytes) AS toast, \
+  pg_size_pretty(table_bytes) AS TABLE FROM ( SELECT *, total_bytes-index_bytes-COALESCE(toast_bytes,0) \
+  AS table_bytes FROM ( SELECT c.oid,nspname AS table_schema, relname AS TABLE_NAME, c.reltuples AS row_estimate, \
+  pg_total_relation_size(c.oid) AS total_bytes, pg_indexes_size(c.oid) AS index_bytes, pg_total_relation_size(reltoastrelid) 
+  AS toast_bytes FROM pg_class c LEFT JOIN pg_namespace n ON n.oid = c.relnamespace WHERE relkind = 'r' ) a ) a \
+  ORDER BY total_bytes DESC;" > "$DATABASE_INFO_DIR/table_sizes.txt"
+  #command to collect the db table row counts:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT schemaname,relname,n_live_tup \
+  FROM pg_stat_user_tables ORDER BY n_live_tup DESC;" > "$DATABASE_INFO_DIR/table_row_counts.txt"
+  #command to collect all tables and their columns:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT table_name, column_name, data_type FROM information_schema.columns \
+  WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;" > "$DATABASE_INFO_DIR/table_columns.txt"
 }
 
 # Function to compress the bundle directory, print the size and location of the archive 
