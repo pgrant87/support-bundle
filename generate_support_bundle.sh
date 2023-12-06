@@ -3,6 +3,7 @@
 
 
 ########## GLOBAL VARIABLES ##########
+
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
 CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
@@ -12,9 +13,31 @@ DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
 DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
 SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
 API_AUTH=""
+# text color escape codes (please note \033 == \e but OSX doesn't respect the \e)
+BLUE_TEXT='\033[94m'
+DEFAULT_TEXT='\033[39m'
+# set -x/xtrace to display every line before execution:
+PS4="${BLUE_TEXT}${BASH_SOURCE[*]}: ${DEFAULT_TEXT}"
 
 
 ########## FUNCTION DECLARATIONS ##########
+
+# Print help function:
+Help()
+{
+   print_banner
+   # Display Help
+   echo -e "This Script will generate a support bundle for Airbyte"
+   echo -e "It collects logs and information about your system, docker, connectors and database."
+   echo -e "It will then compress the bundle and print the location of the archive."
+   echo
+   # $0 is the currently running program
+   echo -e "Syntax: $0"
+   echo -e "options:"
+   echo -e "   -h --help        Print this Help."
+   echo -e "   -x --debug       Verbose mode."
+   echo -e ""
+}
 
 # Pointless banner function for street cred:
 print_banner () {
@@ -195,5 +218,27 @@ main () {
 
 
 ########## BUNDLE EXECUTION ##########
+
+# check for options passed when running the script:
+for argument in "$@"; do
+  case $argument in
+    -h | --help)
+      Help
+      exit
+      ;;
+    -x | --debug)
+      set -o xtrace  # -x display every line before execution; enables PS4
+      ;;
+    *)
+      echo "$argument is not a known command."
+      echo
+      Help
+      exit
+      ;;
+  esac
+  shift
+done
+
+# Run the main script function:
 main
 exit 0
