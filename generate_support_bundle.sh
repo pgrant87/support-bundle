@@ -35,7 +35,7 @@ Help()
    echo -e "Syntax: $0"
    echo -e "options:"
    echo -e "   -h --help        Print this Help."
-   echo -e "   -x --debug       Verbose mode."
+   echo -e "   -x --debug       Debug mode, prints each line of the script before execution."
    echo -e ""
 }
 
