@@ -27,7 +27,7 @@ Help()
 {
    print_banner
    # Display Help
-   echo -e "This Script will generate a support bundle for Airbyte"
+   echo -e "This script will generate a support bundle for Airbyte"
    echo -e "It collects logs and information about your system, docker, connectors and database."
    echo -e "It will then compress the bundle and print the location of the archive."
    echo

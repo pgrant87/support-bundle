@@ -33,8 +33,10 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 Clone this repo inside your airbyte directory and run `./support-bundle/generate_support_bundle.sh` to test the support bundle.
 
 Options: 
-`-h` `--help`   Print the manual page.
-`-x` `--debug`  Run in debug mode, this prints each line of the script before execution.
+
+`-h` / `--help` Print the manual page.
+
+`-x` / `--debug` Run in debug mode, this prints each line of the script before execution.
 
 ### Development
 
