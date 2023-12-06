@@ -28,7 +28,7 @@ Help()
    print_banner
    # Display Help
    echo -e "This script will generate a support bundle for Airbyte"
-   echo -e "It collects logs and information about your system, docker, connectors and database."
+   echo -e "It collects logs and information about your system, Docker, connectors and database."
    echo -e "It will then compress the bundle and print the location of the archive."
    echo
    # $0 is the currently running program
@@ -78,6 +78,8 @@ get_system_info () {
       hostname
       printf "\nIP Address:\n"
       hostname -I
+      printf "\nUptime:\n"
+      uptime
       printf "\nOS Information:\n"
       uname -a 
       printf "\n"
@@ -103,6 +105,8 @@ get_system_info () {
       hostname
       printf "\nIP Address:\n"
       ipconfig getifaddr en0
+      printf "\nUptime:\n"
+      uptime
       printf "\nOS Information:\n"
       uname -a
       printf "\n"
