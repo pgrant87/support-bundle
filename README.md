@@ -16,7 +16,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * .env ✅ (docker-compose.yaml currently populated with the values from .env, will need password redaction)
 * Sync logs (A few days worth to start?)
 * Host info/specs ✅
-* System performance/timeline
+* System performance ✅
 * docker info ✅
 * docker inspect output ✅
 * Connector configuration and info ✅
@@ -25,7 +25,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * Connections in use ✅
 * Database table info/sizes ✅
 * Database Schema ✅
-* Network config and connection details
+* Network config (host and docker) ✅
 * Metrics details
 
 ### Usage

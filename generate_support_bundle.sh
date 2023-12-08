@@ -10,6 +10,7 @@ CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
 CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
 DOCKER_INFO_DIR="$BUNDLE_DIR/docker_info"
 DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
+DOCKER_INSPECT_NETWORK_DIR="$DOCKER_INSPECT_DIR/docker_networks"
 DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
 SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
 API_AUTH=""
@@ -64,6 +65,7 @@ build_bundle_dir () {
   mkdir -p "$CONNECTOR_INFO_DIR"
   mkdir -p "$DOCKER_INSPECT_DIR"
   mkdir -p "$DATABASE_INFO_DIR"
+  mkdir -p "$DOCKER_INSPECT_NETWORK_DIR"
 }
 
 # Function to collect system info:
@@ -86,8 +88,14 @@ get_system_info () {
       lsb_release -a
       printf "\nCPU Information:\n"
       lscpu
+      printf "\n"
+      top -l 1 -n 0 | grep "CPU usage"
       printf "\nMemory Information:\n"
       free -m
+      printf "\nMemory usage:\n"
+      top -l 1 | grep PhysMem
+      printf "\nvm_stat output:\n"
+      free -h
       printf "\nDisk Information:\n"
       df -h
       printf "\nNetwork Information:\n"
@@ -113,8 +121,14 @@ get_system_info () {
       system_profiler SPHardwareDataType SPSoftwareDataType 
       printf "\nCPU Information:\n" 
       sysctl -a | grep machdep.cpu 
+      printf "\n"
+      top -l 1 -n 0 | grep "CPU usage"
       printf "\nMemory Information:\n" 
-      sysctl -a | grep hw.memsize 
+      sysctl -a | grep hw.memsize
+      printf "\nMemory usage:\n"
+      top -l 1 | grep PhysMem
+      printf "\nvm_stat output:\n"
+      vm_stat 
       printf "\nDisk Information:\n" 
       df -h 
       printf "\nNetwork Information:\n" 
@@ -134,7 +148,7 @@ get_system_info () {
 get_docker_info () {
   docker version > "$DOCKER_INFO_DIR/docker-version.txt" 
   docker ps -a > "$DOCKER_INFO_DIR/docker-ps.txt"
-  docker network inspect airbyte_default > "$DOCKER_INFO_DIR/docker-network.txt"
+  get_docker_network_info
   docker images > "$DOCKER_INFO_DIR/docker-images.txt"
   docker system df > "$DOCKER_INFO_DIR/docker-system.txt"
   docker info > "$DOCKER_INFO_DIR/docker-info.txt"
@@ -151,6 +165,13 @@ get_container_info () {
   for CONTAINER in $CONTAINERS; do
     docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log" 2>&1
     docker inspect "$CONTAINER" > "$DOCKER_INSPECT_DIR/$CONTAINER-inspect.txt" 2>&1
+  done
+}
+
+get_docker_network_info () {
+  NETWORKS=$(docker network ls --format "{{.Name}}")
+  for NETWORK in $NETWORKS; do
+    docker network inspect "$NETWORK" > "$DOCKER_INSPECT_NETWORK_DIR/$NETWORK-network-inspect.txt" 2>&1
   done
 }
 
