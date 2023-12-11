@@ -30,11 +30,13 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 
 ### Usage
 
-Clone this repo inside your airbyte directory and run `./support-bundle/generate_support_bundle.sh` to test the support bundle.
+Clone this repo inside your airbyte directory and run `./generate_support_bundle.sh` to test the support bundle.
 
 Options: 
 
-`-h` / `--help` Print the manual page.
+`-h` / `--help` Print the help manual page.
+
+`-t` / `--ticket` Add a related ticket number to the archive name.
 
 `-x` / `--debug` Run in debug mode, this prints each line of the script before execution.
 

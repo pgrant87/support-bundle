@@ -5,14 +5,6 @@
 ########## GLOBAL VARIABLES ##########
 
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
-BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
-CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
-CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
-DOCKER_INFO_DIR="$BUNDLE_DIR/docker_info"
-DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
-DOCKER_INSPECT_NETWORK_DIR="$DOCKER_INSPECT_DIR/docker_networks"
-DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
-SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
 API_AUTH=""
 # text color escape codes (please note \033 == \e but OSX doesn't respect the \e)
 BLUE_TEXT='\033[94m'
@@ -30,12 +22,13 @@ Help()
    # Display Help
    echo -e "This script will generate a support bundle for Airbyte"
    echo -e "It collects logs and information about your system, Docker, connectors and database."
-   echo -e "It will then compress the bundle and print the location of the archive."
+   echo -e "It will then compress the bundle and print the size and location of the archive."
    echo
    # $0 is the currently running program
    echo -e "Syntax: $0"
    echo -e "options:"
-   echo -e "   -h --help        Print this Help."
+   echo -e "   -h --help        Print the Help page."
+   echo -e "   -t --ticket      Add a related ticket number to the archive name."
    echo -e "   -x --debug       Debug mode, prints each line of the script before execution."
    echo -e ""
 }
@@ -61,6 +54,15 @@ print_banner () {
 
 # Function to create the bundle directory structure:
 build_bundle_dir () {
+  # Set dir names
+  CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
+  CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
+  DOCKER_INFO_DIR="$BUNDLE_DIR/docker_info"
+  DOCKER_INSPECT_DIR="$DOCKER_INFO_DIR/docker_inspect"
+  DOCKER_INSPECT_NETWORK_DIR="$DOCKER_INSPECT_DIR/docker_networks"
+  DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
+  SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
+  # Create the bundle directory structure:
   mkdir -p "$CONTAINER_LOGS_DIR"
   mkdir -p "$CONNECTOR_INFO_DIR"
   mkdir -p "$DOCKER_INSPECT_DIR"
@@ -224,6 +226,7 @@ get_database_info () {
 # Function to compress the bundle directory, print the size and location of the archive 
 # and then remove the bundle directory:
 clean_up () {
+  BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
   tar -czf "$BUNDLE_TARBALL" -C "$BUNDLE_DIR" .
   echo "$(du -sh "$BUNDLE_TARBALL" | cut -f1) support bundle generated at ""$BUNDLE_TARBALL"""
   rm -rf "$BUNDLE_DIR"
@@ -245,23 +248,28 @@ main () {
 ########## BUNDLE EXECUTION ##########
 
 # check for options passed when running the script:
-for argument in "$@"; do
-  case $argument in
-    -h | --help)
+while [[ $# -gt 0 ]]; do
+  OPN="$1"
+  case $OPN in
+    -h|--help)
       Help
-      exit
+      exit 0
       ;;
-    -x | --debug)
-      set -o xtrace  # -x display every line before execution; enables PS4
+    -t|--ticket)
+      BUNDLE_DIR="$BUNDLE_DIR-#$2"
+      shift
+      shift
+      ;;
+    -x|--debug)
+      set -x
+      shift
       ;;
     *)
-      echo "$argument is not a known command."
-      echo
+      echo -e "Unknown option: $OPN"
       Help
-      exit
+      exit 1
       ;;
   esac
-  shift
 done
 
 # Run the main script function:
