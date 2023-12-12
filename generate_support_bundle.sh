@@ -28,6 +28,7 @@ Help()
    echo -e "Syntax: $0"
    echo -e "options:"
    echo -e "   -h --help        Print the Help page."
+   echo -e "   -d --dir         Specify a directory to create the archive in."
    echo -e "   -t --ticket      Add a related ticket number to the archive name."
    echo -e "   -x --debug       Debug mode, prints each line of the script before execution."
    echo -e ""
@@ -254,6 +255,17 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       Help
       exit 0
+      ;;
+    -d|--dir)
+      #check if the passed directory exists:
+      if [ -d "$2" ]; then
+        BUNDLE_DIR="$2/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
+        shift
+        shift
+      else
+        echo -e "The specified directory does not exist, exiting"
+        exit 1
+      fi
       ;;
     -t|--ticket)
       BUNDLE_DIR="$BUNDLE_DIR-#$2"

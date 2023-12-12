@@ -36,6 +36,8 @@ Options:
 
 `-h` / `--help` Print the help manual page.
 
+`-d` / `--dir` Specify a directory to create the archive in.
+
 `-t` / `--ticket` Add a related ticket number to the archive name.
 
 `-x` / `--debug` Run in debug mode, this prints each line of the script before execution.
