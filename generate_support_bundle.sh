@@ -222,6 +222,10 @@ get_database_info () {
   #command to collect all tables and their columns:
   docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT table_name, column_name, data_type FROM information_schema.columns \
   WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;" > "$DATABASE_INFO_DIR/table_columns.txt"
+  #command to save the airbyte_config_migrations table:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_configs_migrations;" > "$DATABASE_INFO_DIR/airbyte_config_migrations.txt"
+  #command to save the airbyte_jobs_migration table:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_jobs_migrations;" > "$DATABASE_INFO_DIR/airbyte_jobs_migrations.txt"
 }
 
 # Function to compress the bundle directory, print the size and location of the archive 
