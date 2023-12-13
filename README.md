@@ -20,8 +20,8 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * docker info ✅
 * docker inspect output ✅
 * Connector configuration and info ✅
-* Current connector versions
-* Connector upgrade history
+* Current connector versions ✅
+* Connector upgrade history ✅
 * Connections in use ✅
 * Database table info/sizes ✅
 * Database Schema ✅

@@ -226,6 +226,9 @@ get_database_info () {
   docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_configs_migrations;" > "$DATABASE_INFO_DIR/airbyte_config_migrations.txt"
   #command to save the airbyte_jobs_migration table:
   docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_jobs_migrations;" > "$DATABASE_INFO_DIR/airbyte_jobs_migrations.txt"
+  #command to save connector version history to file:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT docker_repository, docker_image_tag, created_at, updated_at, release_date, release_stage \
+  FROM actor_definition_version ORDER BY docker_repository;" > "$CONNECTOR_INFO_DIR/connector_version_history.txt"
 }
 
 # Function to compress the bundle directory, print the size and location of the archive 
