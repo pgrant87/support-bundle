@@ -26,7 +26,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * Database table info/sizes ✅
 * Database Schema ✅
 * Network config (host and docker) ✅
-* Metrics details
+* Metrics config ✅
 
 ### Usage
 
@@ -40,7 +40,7 @@ Options:
 
 `-t` / `--ticket` Add a related ticket number to the archive name.
 
-`-x` / `--debug` Run in debug mode, this prints each line of the script before execution.
+`-v` / `--verbose` Run in debug mode, this prints each line of the script before execution.
 
 ### Development
 

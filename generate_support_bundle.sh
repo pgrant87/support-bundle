@@ -9,7 +9,7 @@ API_AUTH=""
 # text color escape codes (please note \033 == \e but OSX doesn't respect the \e)
 BLUE_TEXT='\033[94m'
 DEFAULT_TEXT='\033[39m'
-# set -x/xtrace to display every line before execution:
+# set -v/xtrace to display every line before execution:
 PS4="${BLUE_TEXT}${BASH_SOURCE[*]}: ${DEFAULT_TEXT}"
 
 
@@ -30,7 +30,7 @@ Help()
    echo -e "   -h --help        Print the Help page."
    echo -e "   -d --dir         Specify a directory to create the archive in."
    echo -e "   -t --ticket      Add a related ticket number to the archive name."
-   echo -e "   -x --debug       Debug mode, prints each line of the script before execution."
+   echo -e "   -v --verbose     Verbose mode, prints each line of the script before execution."
    echo -e ""
 }
 
@@ -149,13 +149,13 @@ get_system_info () {
 
 # Function to collect docker details:
 get_docker_info () {
+  docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
   docker version > "$DOCKER_INFO_DIR/docker-version.txt" 
   docker ps -a > "$DOCKER_INFO_DIR/docker-ps.txt"
   get_docker_network_info
   docker images > "$DOCKER_INFO_DIR/docker-images.txt"
   docker system df > "$DOCKER_INFO_DIR/docker-system.txt"
   docker info > "$DOCKER_INFO_DIR/docker-info.txt"
-  docker-compose config > "$DOCKER_INFO_DIR/docker-compose.yaml"
   docker-compose ps > "$DOCKER_INFO_DIR/docker-compose-ps.txt"
   docker-compose top > "$DOCKER_INFO_DIR/docker-compose-top.txt"
   docker-compose version > "$DOCKER_INFO_DIR/docker-compose-version.txt"
@@ -223,10 +223,10 @@ get_database_info () {
   docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT table_name, column_name, data_type FROM information_schema.columns \
   WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;" > "$DATABASE_INFO_DIR/table_columns.txt"
   #command to save the airbyte_config_migrations table:
-  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_configs_migrations;" > "$DATABASE_INFO_DIR/airbyte_config_migrations.txt"
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_configs_migrations;" > "$DATABASE_INFO_DIR/airbyte_config_migrations_table.txt"
   #command to save the airbyte_jobs_migration table:
-  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_jobs_migrations;" > "$DATABASE_INFO_DIR/airbyte_jobs_migrations.txt"
-  #command to save connector version history to file:
+  docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT * FROM airbyte_jobs_migrations;" > "$DATABASE_INFO_DIR/airbyte_jobs_migrations_table.txt"
+  #command to save connector version history to a file:
   docker exec -i airbyte-db psql -U docker -d airbyte -c "SELECT docker_repository, docker_image_tag, created_at, updated_at, release_date, release_stage \
   FROM actor_definition_version ORDER BY docker_repository;" > "$CONNECTOR_INFO_DIR/connector_version_history.txt"
 }
@@ -279,7 +279,7 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
-    -x|--debug)
+    -v|--verbose)
       set -x
       shift
       ;;
