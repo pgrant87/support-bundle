@@ -6,6 +6,7 @@
 
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 API_AUTH=""
+REDACT_ENABLED=0
 # text color escape codes (please note \033 == \e but OSX doesn't respect the \e)
 BLUE_TEXT='\033[94m'
 DEFAULT_TEXT='\033[39m'
@@ -29,6 +30,7 @@ Help()
    echo -e "options:"
    echo -e "   -h --help        Print the Help page."
    echo -e "   -d --dir         Specify a directory to create the archive in."
+   echo -e "   -r --redact      Redact passwords from the docker-compose.yaml file."
    echo -e "   -t --ticket      Add a related ticket number to the archive name."
    echo -e "   -v --verbose     Verbose mode, prints each line of the script before execution."
    echo -e ""
@@ -150,6 +152,9 @@ get_system_info () {
 # Function to collect docker details:
 get_docker_info () {
   docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
+  if [ "$REDACT_ENABLED" -eq 1 ]; then
+    redact_passwords "$BUNDLE_DIR/docker-compose.yaml"
+  fi
   docker version > "$DOCKER_INFO_DIR/docker-version.txt" 
   docker ps -a > "$DOCKER_INFO_DIR/docker-ps.txt"
   get_docker_network_info
@@ -160,6 +165,26 @@ get_docker_info () {
   docker-compose top > "$DOCKER_INFO_DIR/docker-compose-top.txt"
   docker-compose version > "$DOCKER_INFO_DIR/docker-compose-version.txt"
   docker-compose images > "$DOCKER_INFO_DIR/docker-compose-images.txt"
+}
+
+#function to redact passwords from a passed file:
+redact_passwords() {
+  # Check if the file exists
+  if [ ! -f "$1" ]; then
+      echo "File not found: $1"
+      return 1
+  fi
+
+  # read the file and redact any password values, 
+  # this creates a new file with the .redacted extension.
+  # the original file is not modified. 
+  while IFS= read -r line; do
+    if [[ "$line" =~ (password|PASSWORD) ]]; then
+      echo "$line" | sed -E 's/(password|PASSWORD):.*/\1: **REDACTED**/g'
+    else
+      echo "$line"
+    fi
+  done < "$1" > "$1.redacted"
 }
 
 # Function to collect all the container logs and inspect output:
@@ -234,6 +259,9 @@ get_database_info () {
 # Function to compress the bundle directory, print the size and location of the archive 
 # and then remove the bundle directory:
 clean_up () {
+  if [ "$REDACT_ENABLED" -eq 1 ]; then
+    rm -rf "$BUNDLE_DIR/docker-compose.yaml"
+  fi
   BUNDLE_TARBALL="$BUNDLE_DIR.tar.gz"
   tar -czf "$BUNDLE_TARBALL" -C "$BUNDLE_DIR" .
   echo "$(du -sh "$BUNDLE_TARBALL" | cut -f1) support bundle generated at ""$BUNDLE_TARBALL"""
@@ -273,6 +301,10 @@ while [[ $# -gt 0 ]]; do
         echo -e "The specified directory does not exist, exiting"
         exit 1
       fi
+      ;;
+    -r|--redact)
+      REDACT_ENABLED=1
+      shift
       ;;
     -t|--ticket)
       BUNDLE_DIR="$BUNDLE_DIR-#$2"

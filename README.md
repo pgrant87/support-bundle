@@ -38,6 +38,8 @@ Options:
 
 `-d` / `--dir` Specify a directory to create the archive in.
 
+`-r` / `--redact` Redact passwords from the docker-compose.yaml file.
+
 `-t` / `--ticket` Add a related ticket number to the archive name.
 
 `-v` / `--verbose` Run in debug mode, this prints each line of the script before execution.
