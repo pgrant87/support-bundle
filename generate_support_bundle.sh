@@ -29,8 +29,8 @@ Help()
    # $0 is the currently running program
    echo -e "Syntax: $0"
    echo -e "options:"
-   echo -e "   -h --help        Print the Help page."
    echo -e "   -d --dir         Specify a directory to create the archive in."
+   echo -e "   -h --help        Print the Help page."
    echo -e "   -l --log-age     Specify the number of days worth of sync logs to collect. (default = 3)"
    echo -e "   -r --redact      Redact passwords from the docker-compose.yaml file."
    echo -e "   -t --ticket      Add a related ticket number to the archive name."

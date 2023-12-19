@@ -34,9 +34,9 @@ Clone this repo inside your airbyte directory and run `./generate_support_bundle
 
 Options: 
 
-`-h` / `--help` Print the help manual page.
-
 `-d` / `--dir` Specify a directory to create the archive in.
+
+`-h` / `--help` Print the help manual page.
 
 `-l` / `--log-age` Specify the number of days worth of sync logs to collect. (default = 3)
 
