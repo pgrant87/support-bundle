@@ -14,7 +14,7 @@ Working doc for this lives at https://docs.google.com/document/d/1xue_F3tKxAZnFY
 * All container logs ✅
 * docker-compose.yaml ✅
 * .env ✅ (docker-compose.yaml currently populated with the values from .env, will need password redaction)
-* Sync logs (A few days worth to start?)
+* Sync logs (default is 3 days) ✅
 * Host info/specs ✅
 * System performance ✅
 * docker info ✅
@@ -38,11 +38,13 @@ Options:
 
 `-d` / `--dir` Specify a directory to create the archive in.
 
+`-l` / `--log-age` Specify the number of days worth of sync logs to collect. (default = 3)
+
 `-r` / `--redact` Redact passwords from the docker-compose.yaml file.
 
 `-t` / `--ticket` Add a related ticket number to the archive name.
 
-`-v` / `--verbose` Run in debug mode, this prints each line of the script before execution.
+`-v` / `--verbose` Run in verbose mode, this prints each line of the script before execution.
 
 ### Development
 

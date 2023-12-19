@@ -6,6 +6,7 @@
 
 BUNDLE_DIR="/tmp/airbyte-support-bundle-$(date +%Y-%m-%d-%H-%M-%S)"
 API_AUTH=""
+LOG_AGE=3
 REDACT_ENABLED=0
 # text color escape codes (please note \033 == \e but OSX doesn't respect the \e)
 BLUE_TEXT='\033[94m'
@@ -30,6 +31,7 @@ Help()
    echo -e "options:"
    echo -e "   -h --help        Print the Help page."
    echo -e "   -d --dir         Specify a directory to create the archive in."
+   echo -e "   -l --log-age     Specify the number of days worth of sync logs to collect. (default = 3)"
    echo -e "   -r --redact      Redact passwords from the docker-compose.yaml file."
    echo -e "   -t --ticket      Add a related ticket number to the archive name."
    echo -e "   -v --verbose     Verbose mode, prints each line of the script before execution."
@@ -65,12 +67,14 @@ build_bundle_dir () {
   DOCKER_INSPECT_NETWORK_DIR="$DOCKER_INSPECT_DIR/docker_networks"
   DATABASE_INFO_DIR="$BUNDLE_DIR/database_info"
   SYSTEMINFO_FILE="$BUNDLE_DIR/system_info.txt"
+  AIRBYTE_SERVER_DIR="$BUNDLE_DIR/airbyte-server"
   # Create the bundle directory structure:
   mkdir -p "$CONTAINER_LOGS_DIR"
   mkdir -p "$CONNECTOR_INFO_DIR"
   mkdir -p "$DOCKER_INSPECT_DIR"
   mkdir -p "$DATABASE_INFO_DIR"
   mkdir -p "$DOCKER_INSPECT_NETWORK_DIR"
+  mkdir -p "$AIRBYTE_SERVER_DIR"
 }
 
 # Function to collect system info:
@@ -196,6 +200,15 @@ get_container_info () {
   done
 }
 
+get_sync_logs () {
+  # copy the airbyte-server logs to the airbyte server directory:
+  docker cp airbyte-server:/tmp "$AIRBYTE_SERVER_DIR"
+  # remove any files greater than $LOG_AGE days old (defaults to 3):
+  find "$AIRBYTE_SERVER_DIR" -type f -mtime +"$LOG_AGE" -exec rm -rf {} \;
+  # remove any directorys greater than $LOG_AGE days old (defaults to 3):
+  find "$AIRBYTE_SERVER_DIR" -type d -mtime +"$LOG_AGE" -exec rm -rf {} \;
+}
+
 get_docker_network_info () {
   NETWORKS=$(docker network ls --format "{{.Name}}")
   for NETWORK in $NETWORKS; do
@@ -273,6 +286,7 @@ main () {
   print_banner
   build_bundle_dir
   get_system_info
+  get_sync_logs
   get_docker_info
   get_container_info
   get_connector_details
@@ -299,6 +313,17 @@ while [[ $# -gt 0 ]]; do
         shift
       else
         echo -e "The specified directory does not exist, exiting"
+        exit 1
+      fi
+      ;;
+    -l|--log-age)
+      #check the value entered is between 1 and 365 days:
+      if [ "$2" -ge 1 ] && [ "$2" -le 365 ]; then
+        LOG_AGE="$2"
+        shift
+        shift
+      else
+        echo -e "The log age must be between 1 and 365 days, exiting"
         exit 1
       fi
       ;;
