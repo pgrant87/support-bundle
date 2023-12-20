@@ -46,14 +46,6 @@ Options:
 
 `-v` / `--verbose` Run in verbose mode, this prints each line of the script before execution.
 
-### Development
-
-For any additions, I would ask that the [Shellcheck](https://www.shellcheck.net/) linter is adhered to:
-https://github.com/koalaman/shellcheck
-
-The VScode plugin is particularly useful:
-https://github.com/vscode-shellcheck/vscode-shellcheck
-
 ### What gets bundled and where?
 
 Key directories and files:
@@ -68,7 +60,7 @@ Key directories and files:
 
 * `docker-compose.yaml` The docker compose file filled with values from `.env`
 
-* `system_info.txt` Host, CPU, Memory, Disk and network info all in a single file
+* `system_info.txt` Host, CPU, Memory, Disk and network info all in a single file.
 
 Your decompressed Airbyte Support Bundle will contain the following structure:
 
@@ -138,5 +130,10 @@ Your decompressed Airbyte Support Bundle will contain the following structure:
 └── system_info.txt
 ```
 
+### Development
 
+For any additions, I would ask that the [Shellcheck](https://www.shellcheck.net/) linter is adhered to:
+https://github.com/koalaman/shellcheck
 
+The VScode plugin is particularly useful:
+https://github.com/vscode-shellcheck/vscode-shellcheck
