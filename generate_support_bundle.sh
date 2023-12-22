@@ -59,6 +59,7 @@ print_banner () {
 
 # Function to create the bundle directory structure:
 build_bundle_dir () {
+  echo "Building bundle directory structure..."
   # Set dir names
   CONTAINER_LOGS_DIR="$BUNDLE_DIR/container_logs"
   CONNECTOR_INFO_DIR="$BUNDLE_DIR/connector_info"
@@ -79,6 +80,7 @@ build_bundle_dir () {
 
 # Function to collect system info:
 get_system_info () {
+  echo "Gathering system information..."
   
   # Function to collect in-depth system information for Linux:
   get_linux_info () {
@@ -155,6 +157,7 @@ get_system_info () {
 
 # Function to collect docker details:
 get_docker_info () {
+  echo "Gathering docker details..."
   docker-compose config > "$BUNDLE_DIR/docker-compose.yaml"
   if [ "$REDACT_ENABLED" -eq 1 ]; then
     redact_passwords "$BUNDLE_DIR/docker-compose.yaml"
@@ -193,6 +196,7 @@ redact_passwords() {
 
 # Function to collect all the container logs and inspect output:
 get_container_info () {
+  echo "Gathering container logs..."
   CONTAINERS=$(docker-compose ps --format "{{.Names}}")
   for CONTAINER in $CONTAINERS; do
     docker logs "$CONTAINER" > "$CONTAINER_LOGS_DIR/$CONTAINER.log" 2>&1
@@ -201,8 +205,10 @@ get_container_info () {
 }
 
 get_sync_logs () {
+  echo "Gathering airbyte-server /tmp direcotry..."
   # copy the airbyte-server logs to the airbyte server directory:
   docker cp airbyte-server:/tmp "$AIRBYTE_SERVER_DIR"
+  echo "Removing files and directories older than ""$LOG_AGE"" days old..."
   # remove any files greater than $LOG_AGE days old (defaults to 3):
   find "$AIRBYTE_SERVER_DIR" -type f -mtime +"$LOG_AGE" -exec rm -rf {} \;
   # remove any directorys greater than $LOG_AGE days old (defaults to 3):
@@ -210,6 +216,7 @@ get_sync_logs () {
 }
 
 get_docker_network_info () {
+  echo "Gathering docker network info..."
   NETWORKS=$(docker network ls --format "{{.Name}}")
   for NETWORK in $NETWORKS; do
     docker network inspect "$NETWORK" > "$DOCKER_INSPECT_NETWORK_DIR/$NETWORK-network-inspect.txt" 2>&1
@@ -228,6 +235,7 @@ get_env_credentials () {
 
 # Function to collect source, destination and connection details via the airbyte API:
 get_connector_details () {
+  echo "Gathering connector details..."
   get_env_credentials
 
   # API endpoints
@@ -242,6 +250,7 @@ get_connector_details () {
 
 # Function to collect database tables, sizes and schema
 get_database_info () {
+  echo "Gathering database info..."
   #command to collec tthe db schema:
   docker exec -i airbyte-db pg_dump -U docker -d airbyte --schema-only > "$DATABASE_INFO_DIR/schema.sql"
   #command to collect the db tables and sizes:
@@ -272,6 +281,7 @@ get_database_info () {
 # Function to compress the bundle directory, print the size and location of the archive 
 # and then remove the bundle directory:
 clean_up () {
+  echo "Compressing bundle directory..."
   if [ "$REDACT_ENABLED" -eq 1 ]; then
     rm -rf "$BUNDLE_DIR/docker-compose.yaml"
   fi
@@ -284,6 +294,7 @@ clean_up () {
 # Main flow and function calls:
 main () {
   print_banner
+  echo -e "Generating support bundle..."
   build_bundle_dir
   get_system_info
   get_sync_logs

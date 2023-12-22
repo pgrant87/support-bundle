@@ -50,7 +50,7 @@ Options:
 
 Key directories and files:
 
-* `airbyte-server` This is basically a copy of the `/tmp` folder from the airbyte-server container. This contains all the sync logs. By default we collect 3 days worth but this can be specified using the `--log-age` option
+* `airbyte-server` This is basically a copy of the `/tmp` folder from the airbyte-server container. This contains all the sync logs. By default we collect 3 days worth but this can be specified using the `--log-age` option.
 
 * `connector_info` This contains source, destination and connection info gathered from the [Airbyte API](https://api.airbyte.com/).
 
@@ -58,7 +58,7 @@ Key directories and files:
 
 * `database_info` Database schema, table info and migration data.
 
-* `docker-compose.yaml` The docker compose file filled with values from `.env`
+* `docker-compose.yaml` The docker compose file filled with values from `.env`.
 
 * `system_info.txt` Host, CPU, Memory, Disk and network info all in a single file.
 
